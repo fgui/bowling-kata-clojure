@@ -1,8 +1,6 @@
 (ns kata-bcn.core)
 (use 'clojure.test)
 
-(is (= 5 (+ 3 4)))
-
 
 (def all-zeros-game (take 20 (repeat 0)))
 
@@ -16,8 +14,6 @@
 
 (def an-almost-perfect-game (flatten (concat (take 9 (repeat [10 "X"])) [8 2])))
 
-(def an-almost-perfect-game (flatten (take 10 (repeat [10 "X"]))))
-
 (def a-perfect-game (flatten (concat (take 9 (repeat [10 "X"])) [10 10 10])))
 
 (defn sum [x]
@@ -25,7 +21,7 @@
 
 (defn nth-frame [n game]
   (let [[first-part second-part] (split-at (+ 2 (* 2 n)) game)]
-    [(reverse (take 2 (reverse first-part)))
+    [(drop (- (count first-part) 2) first-part)
      (take 2 (remove #(= % "X") second-part))]))
 
 (defn game->frames-with-accompanying-rolls
@@ -36,13 +32,16 @@
 (defn score-for-frame-with-accompanying-rolls
   [[[frame0-0 frame0-1] [frame1-0 frame1-1]]]
   (if (= 10 frame0-0)
-    (+ frame0-0 frame1-0 frame1-1)
+    (if (not= "X" frame0-1)
+      (+ frame0-0 frame0-1 frame1-0)
+      (+ frame0-0 frame1-0 frame1-1))
     (if (= 10 (+ frame0-0 frame0-1))
            (+ 10 frame1-0)
            (+ frame0-0 frame0-1))))
+
 (defn score
   [_game]
-  (let [game (concat _game (take 10 (repeat 10)))]
+  (let [game (concat _game (take 10 (repeat 0)))]
     (sum (map score-for-frame-with-accompanying-rolls (game->frames-with-accompanying-rolls game)))))
 
 
