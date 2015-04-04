@@ -14,8 +14,11 @@
 
 (defn nth-frame [n game]
   (let [[first-part second-part] (split-at (position-frame-cut n game) game)]
-    [(drop (position-frame-cut (- n 1) game) first-part)
-     (take 2 second-part)]))
+    [
+     (drop (position-frame-cut (- n 1) game) first-part) ;; frame
+     (take 2 second-part) ;; just need the following 2 rolls.
+     ])
+  )
 
 (defn game->frames-with-accompanying-rolls
   [game]
@@ -24,10 +27,10 @@
 
 (defn score-for-frame-with-accompanying-rolls
   [[[frame0-0 frame0-1] [frame1-0 frame1-1]]]
-  (if (= 10 frame0-0)
+  (if (= 10 frame0-0) ;;strike
     (if (nil? frame0-1)
-      (+ frame0-0 frame1-0 frame1-1)
-      (+ frame0-0 frame0-1 frame1-0)
+      (+ frame0-0 frame1-0 frame1-1) ;;strike not last frame
+      (+ frame0-0 frame0-1 frame1-0) ;;strike an last frame
       )
     (if (= 10 (+ frame0-0 frame0-1))
            (+ 10 frame1-0)
@@ -36,7 +39,9 @@
 (defn score
   [_game]
   (let [game (concat _game (take 10 (repeat 0)))]
-    (sum (map score-for-frame-with-accompanying-rolls (game->frames-with-accompanying-rolls game)))))
+    (sum (
+          map score-for-frame-with-accompanying-rolls
+              (game->frames-with-accompanying-rolls game)))))
 
 ;;;;;;;;;;;;;
 ;;; Tests
